@@ -26,10 +26,15 @@ export default function Index() {
             </div>
             <span className="font-display font-bold text-xl">PulseVote</span>
           </div>
-          <Button onClick={() => navigate('/auth')} variant="default">
-            Get Started
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button onClick={() => navigate('/auth?mode=login')} variant="outline">
+              Sign In
+            </Button>
+            <Button onClick={() => navigate('/auth')} variant="default">
+              Get Started
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          </div>
         </nav>
 
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 lg:py-32 text-center">

@@ -63,9 +63,12 @@ export function useSurveys() {
       }));
 
       setSurveys(processedSurveys);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching surveys:', error);
-      toast.error('Failed to load surveys');
+      // Don't show error toast for empty results or permission issues
+      if (error?.code !== 'PGRST116') {
+        toast.error('Failed to load surveys');
+      }
     } finally {
       setLoading(false);
     }
