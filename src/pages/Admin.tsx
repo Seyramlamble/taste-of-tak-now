@@ -212,7 +212,7 @@ export default function AdminDashboard() {
           description: manualSurvey.description || null,
           author_id: user!.id,
           preference_id: manualSurvey.preferenceId || null,
-          target_country: manualSurvey.targetCountry || null,
+          target_country: manualSurvey.targetCountry === 'all' ? null : (manualSurvey.targetCountry || null),
           image_url: manualSurvey.imageUrl || null,
           is_published: true,
           allow_multiple_answers: manualSurvey.allowMultiple
@@ -499,7 +499,7 @@ export default function AdminDashboard() {
                       <SelectValue placeholder="All countries" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All countries</SelectItem>
+                      <SelectItem value="all">All countries</SelectItem>
                       {countries.slice(1).map(country => (
                         <SelectItem key={country.code} value={country.code}>
                           {country.name}
