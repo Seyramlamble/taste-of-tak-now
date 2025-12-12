@@ -39,7 +39,8 @@ export default function Index() {
           </div>
           <h1 className="font-display text-4xl lg:text-6xl font-bold mb-6 leading-tight">
             Your Voice,{' '}
-            <span className="text-transparent bg-clip-text gradient-primary">
+            <br className="sm:hidden" />
+            <span className="text-primary">
               Your Community
             </span>
           </h1>
