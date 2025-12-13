@@ -24,7 +24,7 @@ export default function Index() {
             <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-lg">
               <MessageSquare className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-display font-bold text-xl">PulseVote</span>
+            <span className="font-display font-bold text-xl">VoiceHub</span>
           </div>
           <div className="flex items-center gap-3">
             <Button onClick={() => navigate('/auth?mode=login')} variant="outline">
@@ -50,7 +50,7 @@ export default function Index() {
             </span>
           </h1>
           <p className="text-lg lg:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join PulseVote to participate in surveys that matter to you. Share opinions,
+            Join VoiceHub to participate in surveys that matter to you. Share opinions,
             discover trends, and connect with like-minded people across topics you care about.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -66,7 +66,7 @@ export default function Index() {
       <section className="max-w-6xl mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h2 className="font-display text-3xl lg:text-4xl font-bold mb-4">
-            Why PulseVote?
+            Why VoiceHub?
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             A new way to engage with your community through quick, meaningful polls
@@ -129,10 +129,10 @@ export default function Index() {
             <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
               <MessageSquare className="w-4 h-4 text-primary-foreground" />
             </div>
-            <span className="font-display font-bold">PulseVote</span>
+            <span className="font-display font-bold">VoiceHub</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © 2024 PulseVote. All rights reserved.
+            © 2024 VoiceHub. All rights reserved.
           </p>
         </div>
       </footer>
