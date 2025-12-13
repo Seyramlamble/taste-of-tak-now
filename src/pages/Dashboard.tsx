@@ -82,7 +82,7 @@ export default function DashboardPage() {
           <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
             <MessageSquare className="w-4 h-4 text-primary-foreground" />
           </div>
-          <span className="font-display font-bold">PulseVote</span>
+          <span className="font-display font-bold">VoiceHub</span>
         </Link>
         <div className="w-10" />
       </header>
@@ -110,7 +110,7 @@ export default function DashboardPage() {
               <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-md">
                 <MessageSquare className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-xl">PulseVote</span>
+              <span className="font-display font-bold text-xl">VoiceHub</span>
             </Link>
             <Button
               variant="ghost"

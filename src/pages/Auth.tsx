@@ -78,7 +78,7 @@ export default function AuthPage() {
             </div>
           </Link>
           <h1 className="text-3xl font-display font-bold text-gradient">
-            PulseVote
+            VoiceHub
           </h1>
           <p className="text-muted-foreground mt-2">
             Your voice matters. Share your opinion.

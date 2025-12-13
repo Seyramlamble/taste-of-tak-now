@@ -20,7 +20,7 @@ serve(async (req) => {
 
     console.log(`Generating survey suggestions for country: ${country}, category: ${category}`);
 
-    const systemPrompt = `You are a creative survey suggestion generator for a community polling platform called PulseVote. 
+    const systemPrompt = `You are a creative survey suggestion generator for a community polling platform called VoiceHub. 
 Generate engaging, thought-provoking survey questions that will spark discussion and get people voting.
 
 Rules:
