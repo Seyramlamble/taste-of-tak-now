@@ -43,12 +43,8 @@ export default function DashboardPage() {
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
-    if (userPreferences.length > 0) {
-      fetchSurveys(activeCategory ? [activeCategory] : userPreferences);
-    } else if (!prefLoading && userPreferences.length === 0) {
-      fetchSurveys();
-    }
-  }, [userPreferences, activeCategory, prefLoading]);
+    fetchSurveys();
+  }, [fetchSurveys]);
 
   const handleLogout = async () => {
     await signOut();

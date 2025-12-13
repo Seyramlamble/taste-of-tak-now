@@ -9,27 +9,21 @@ export function useSurveys() {
   const [surveys, setSurveys] = useState<SurveyWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchSurveys = useCallback(async (preferenceIds?: string[]) => {
+  const fetchSurveys = useCallback(async () => {
     setLoading(true);
     try {
-      let query = supabase
+      // Fetch all published surveys - no preference filtering
+      const { data, error } = await supabase
         .from('surveys')
         .select(`
           *,
           options:survey_options(*),
           reactions(*),
           comments(*),
-          preference:preferences(*),
-          author:profiles(*)
+          preference:preferences(*)
         `)
         .eq('is_published', true)
         .order('created_at', { ascending: false });
-
-      if (preferenceIds && preferenceIds.length > 0) {
-        query = query.in('preference_id', preferenceIds);
-      }
-
-      const { data, error } = await query;
 
       if (error) throw error;
 
