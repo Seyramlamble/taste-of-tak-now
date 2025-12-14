@@ -36,3 +36,6 @@ verify_jwt = true
 
 [functions.generate-survey-image]
 verify_jwt = true
+
+[functions.auto-publish-surveys]
+verify_jwt = false
