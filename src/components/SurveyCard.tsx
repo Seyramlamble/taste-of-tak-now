@@ -51,40 +51,49 @@ export function SurveyCard({ survey, onVote, onReact, onComment }: SurveyCardPro
   };
 
   return (
-    <Card variant="elevated" className="overflow-hidden animate-fade-in">
+    <Card variant="elevated" className="overflow-hidden animate-fade-in group hover:shadow-xl transition-all duration-300 rounded-2xl border-2 border-primary/10 hover:border-primary/30">
       {survey.image_url && (
-        <div className="h-48 overflow-hidden">
+        <div className="h-52 overflow-hidden relative">
           <img
             src={survey.image_url}
             alt={survey.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
         </div>
       )}
       
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-3">
           {survey.preference && (
-            <span className="text-xs font-medium px-3 py-1 rounded-full bg-primary/10 text-primary">
+            <span className="text-xs font-semibold px-4 py-1.5 rounded-full bg-gradient-to-r from-primary/20 to-accent/20 text-primary shadow-sm">
               {survey.preference.icon} {survey.preference.name}
             </span>
           )}
-          <span className="text-xs text-muted-foreground">
+          <span className="text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded-full">
             {formatDistanceToNow(new Date(survey.created_at), { addSuffix: true })}
           </span>
         </div>
-        <CardTitle className="text-xl leading-snug">{survey.title}</CardTitle>
+        <CardTitle className="text-xl leading-snug font-bold bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text">
+          {survey.title}
+        </CardTitle>
         {survey.description && (
-          <p className="text-sm text-muted-foreground mt-1">{survey.description}</p>
+          <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{survey.description}</p>
         )}
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         {/* Survey Options */}
-        <div className="space-y-2">
-          {survey.options.map((option) => {
+        <div className="space-y-3">
+          {survey.options.map((option, index) => {
             const percentage = totalVotes > 0 ? Math.round((option.vote_count / totalVotes) * 100) : 0;
             const isVoted = survey.userVotes?.includes(option.id);
+            const optionColors = [
+              'from-primary/20 to-primary/5 border-primary/30',
+              'from-accent/20 to-accent/5 border-accent/30',
+              'from-secondary/30 to-secondary/10 border-secondary/50',
+              'from-reaction-like/20 to-reaction-like/5 border-reaction-like/30',
+            ];
 
             return (
               <button
@@ -92,25 +101,25 @@ export function SurveyCard({ survey, onVote, onReact, onComment }: SurveyCardPro
                 onClick={() => onVote(survey.id, option.id)}
                 disabled={!user || (hasVoted && !survey.allow_multiple_answers)}
                 className={cn(
-                  'w-full relative overflow-hidden rounded-lg border-2 p-3 text-left transition-all duration-300',
+                  'w-full relative overflow-hidden rounded-xl border-2 p-4 text-left transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]',
                   isVoted
-                    ? 'border-primary bg-primary/5'
-                    : 'border-border hover:border-primary/50',
-                  !user && 'opacity-60 cursor-not-allowed'
+                    ? 'border-primary bg-gradient-to-r from-primary/15 to-primary/5 shadow-md'
+                    : `bg-gradient-to-r ${optionColors[index % optionColors.length]} hover:shadow-md`,
+                  !user && 'opacity-60 cursor-not-allowed hover:scale-100'
                 )}
               >
                 {/* Progress bar background */}
                 {hasVoted && (
                   <div
-                    className="absolute inset-y-0 left-0 bg-primary/10 transition-all duration-500"
+                    className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary/25 to-primary/10 transition-all duration-700 ease-out"
                     style={{ width: `${percentage}%` }}
                   />
                 )}
                 
                 <div className="relative flex items-center justify-between">
-                  <span className="font-medium">{option.option_text}</span>
+                  <span className="font-semibold text-foreground/90">{option.option_text}</span>
                   {hasVoted && (
-                    <span className="text-sm font-semibold text-primary">
+                    <span className="text-sm font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
                       {percentage}%
                     </span>
                   )}
@@ -121,13 +130,13 @@ export function SurveyCard({ survey, onVote, onReact, onComment }: SurveyCardPro
         </div>
 
         {totalVotes > 0 && (
-          <p className="text-center text-sm text-muted-foreground">
-            {totalVotes} vote{totalVotes !== 1 ? 's' : ''}
+          <p className="text-center text-sm text-muted-foreground font-medium">
+            🗳️ {totalVotes} vote{totalVotes !== 1 ? 's' : ''} cast
           </p>
         )}
 
         {/* Reactions */}
-        <div className="flex items-center gap-2 pt-2 border-t">
+        <div className="flex items-center gap-2 pt-3 border-t border-primary/10">
           {(Object.keys(reactionConfig) as ReactionType[]).map((type) => {
             const config = reactionConfig[type];
             const Icon = config.icon;
@@ -137,60 +146,62 @@ export function SurveyCard({ survey, onVote, onReact, onComment }: SurveyCardPro
             return (
               <Button
                 key={type}
-                variant="reaction"
+                variant="ghost"
                 size="sm"
                 onClick={() => onReact(survey.id, type)}
                 className={cn(
-                  'flex-1 gap-1',
-                  isActive && config.activeClass
+                  'flex-1 gap-1.5 rounded-xl transition-all duration-200 hover:scale-105',
+                  isActive && `${config.activeClass} shadow-sm font-semibold`
                 )}
               >
-                <Icon className="w-4 h-4" />
-                <span className="text-xs">{count > 0 && count}</span>
+                <Icon className={cn('w-5 h-5', isActive && 'animate-bounce')} />
+                <span className="text-xs font-medium">{count > 0 && count}</span>
               </Button>
             );
           })}
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowComments(!showComments)}
-            className="flex-1 gap-2"
+            className="flex-1 gap-2 rounded-xl hover:bg-accent/20 transition-colors"
           >
             <MessageCircle className="w-4 h-4" />
-            {survey.comments.length} Comments
+            <span className="font-medium">{survey.comments.length} Comments</span>
             {showComments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleShare}
-            className="flex-1 gap-2"
+            className="flex-1 gap-2 rounded-xl hover:bg-primary/10 transition-colors"
           >
             <Share2 className="w-4 h-4" />
-            Share
+            <span className="font-medium">Share</span>
           </Button>
         </div>
 
         {/* Comments Section */}
         {showComments && (
-          <div className="space-y-3 pt-3 border-t animate-slide-up">
+          <div className="space-y-3 pt-4 border-t border-primary/10 animate-fade-in">
             {user && (
               <div className="flex gap-2">
                 <Input
-                  placeholder="Write a comment..."
+                  placeholder="Write a comment... 💬"
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSubmitComment()}
                   inputSize="sm"
+                  className="rounded-xl border-2 border-primary/20 focus:border-primary/50"
                 />
                 <Button
                   size="icon-sm"
                   onClick={handleSubmitComment}
                   disabled={!commentText.trim()}
+                  className="rounded-xl bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
@@ -202,18 +213,18 @@ export function SurveyCard({ survey, onVote, onReact, onComment }: SurveyCardPro
                 {survey.comments.map((comment) => (
                   <div
                     key={comment.id}
-                    className="p-3 rounded-lg bg-muted/50 text-sm"
+                    className="p-3 rounded-xl bg-gradient-to-r from-muted/70 to-muted/40 text-sm border border-muted"
                   >
-                    <p>{comment.content}</p>
-                    <span className="text-xs text-muted-foreground">
+                    <p className="text-foreground/90">{comment.content}</p>
+                    <span className="text-xs text-muted-foreground mt-1 block">
                       {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No comments yet. Be the first!
+              <p className="text-sm text-muted-foreground text-center py-6 bg-muted/30 rounded-xl">
+                ✨ No comments yet. Be the first to share your thoughts!
               </p>
             )}
           </div>
