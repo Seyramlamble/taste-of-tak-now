@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
-  X
+  X,
+  Users
 } from 'lucide-react';
 
 const categoryColors: Record<string, string> = {
@@ -162,6 +163,12 @@ export default function DashboardPage() {
 
           {/* Bottom Actions */}
           <div className="pt-4 border-t space-y-1">
+            <Link to="/groups">
+              <Button variant="ghost" className="w-full justify-start gap-3">
+                <Users className="w-4 h-4" />
+                My Groups
+              </Button>
+            </Link>
             <Link to="/onboarding">
               <Button variant="ghost" className="w-full justify-start gap-3">
                 <Settings className="w-4 h-4" />

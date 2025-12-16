@@ -49,6 +49,68 @@ export type Database = {
           },
         ]
       }
+      group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string | null
+          role: Database["public"]["Enums"]["group_role"]
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["group_role"]
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: Database["public"]["Enums"]["group_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          type: Database["public"]["Enums"]["group_type"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          type: Database["public"]["Enums"]["group_type"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          type?: Database["public"]["Enums"]["group_type"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       preferences: {
         Row: {
           color: string | null
@@ -132,6 +194,44 @@ export type Database = {
           },
         ]
       }
+      survey_invites: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          expires_at: string | null
+          id: string
+          invite_token: string
+          status: Database["public"]["Enums"]["invite_status"]
+          survey_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          invite_token?: string
+          status?: Database["public"]["Enums"]["invite_status"]
+          survey_id: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          expires_at?: string | null
+          id?: string
+          invite_token?: string
+          status?: Database["public"]["Enums"]["invite_status"]
+          survey_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "survey_invites_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       survey_options: {
         Row: {
           created_at: string | null
@@ -170,8 +270,10 @@ export type Database = {
           author_id: string
           created_at: string | null
           description: string | null
+          group_id: string | null
           id: string
           image_url: string | null
+          is_public_link: boolean | null
           is_published: boolean | null
           preference_id: string | null
           target_country: string | null
@@ -183,8 +285,10 @@ export type Database = {
           author_id: string
           created_at?: string | null
           description?: string | null
+          group_id?: string | null
           id?: string
           image_url?: string | null
+          is_public_link?: boolean | null
           is_published?: boolean | null
           preference_id?: string | null
           target_country?: string | null
@@ -196,8 +300,10 @@ export type Database = {
           author_id?: string
           created_at?: string | null
           description?: string | null
+          group_id?: string | null
           id?: string
           image_url?: string | null
+          is_public_link?: boolean | null
           is_published?: boolean | null
           preference_id?: string | null
           target_country?: string | null
@@ -205,6 +311,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "surveys_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "surveys_preference_id_fkey"
             columns: ["preference_id"]
@@ -309,9 +422,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_group_member: {
+        Args: { _group_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user"
+      group_role: "owner" | "admin" | "member"
+      group_type: "family" | "company"
+      invite_status: "pending" | "accepted" | "declined" | "expired"
       reaction_type: "like" | "dislike" | "laugh" | "sad"
     }
     CompositeTypes: {
@@ -441,6 +561,9 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      group_role: ["owner", "admin", "member"],
+      group_type: ["family", "company"],
+      invite_status: ["pending", "accepted", "declined", "expired"],
       reaction_type: ["like", "dislike", "laugh", "sad"],
     },
   },
