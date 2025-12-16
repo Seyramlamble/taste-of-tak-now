@@ -9,6 +9,8 @@ import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import Groups from "./pages/Groups";
+import GroupSurveys from "./pages/GroupSurveys";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
             <Route path="/onboarding" element={<Onboarding />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/groups" element={<Groups />} />
+            <Route path="/groups/:groupId/surveys" element={<GroupSurveys />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </HashRouter>

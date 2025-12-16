@@ -22,7 +22,9 @@ import {
   RefreshCw,
   ArrowLeft,
   Image as ImageIcon,
-  CheckCircle
+  CheckCircle,
+  Search,
+  Users
 } from 'lucide-react';
 
 interface SurveySuggestion {
@@ -163,6 +165,11 @@ export default function AdminDashboard() {
   const [suggestions, setSuggestions] = useState<SurveySuggestion[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isPublishing, setIsPublishing] = useState<string | null>(null);
+  
+  // Keyword-based generation
+  const [keywords, setKeywords] = useState('');
+  const [keywordSuggestions, setKeywordSuggestions] = useState<SurveySuggestion[]>([]);
+  const [isGeneratingKeyword, setIsGeneratingKeyword] = useState(false);
   
   // Manual survey creation
   const [manualSurvey, setManualSurvey] = useState({
@@ -340,6 +347,81 @@ export default function AdminDashboard() {
     }
   };
 
+  const generateKeywordSuggestions = async () => {
+    if (!keywords.trim()) {
+      toast.error('Please enter some keywords');
+      return;
+    }
+
+    setIsGeneratingKeyword(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-survey-suggestions', {
+        body: { country: selectedCountry, keywords: keywords.trim() }
+      });
+
+      if (error) throw error;
+
+      if (data?.suggestions) {
+        setKeywordSuggestions(data.suggestions.map((s: SurveySuggestion) => ({
+          ...s,
+          isGeneratingImage: false
+        })));
+        toast.success('Generated survey ideas from your keywords!');
+      }
+    } catch (error) {
+      console.error('Error generating keyword suggestions:', error);
+      toast.error('Failed to generate suggestions. Please try again.');
+    } finally {
+      setIsGeneratingKeyword(false);
+    }
+  };
+
+  const publishKeywordSuggestion = async (suggestion: SurveySuggestion) => {
+    setIsPublishing(suggestion.title);
+    try {
+      const categoryName = categoryMap[suggestion.category.toLowerCase()] || suggestion.category;
+      const preference = preferences.find(p => 
+        p.name.toLowerCase() === categoryName.toLowerCase()
+      );
+
+      const { data: survey, error: surveyError } = await supabase
+        .from('surveys')
+        .insert({
+          title: suggestion.title,
+          description: suggestion.description,
+          author_id: user!.id,
+          preference_id: preference?.id || null,
+          target_country: selectedCountry === 'all' ? null : selectedCountry,
+          image_url: suggestion.imageUrl || null,
+          is_published: true,
+          allow_multiple_answers: false
+        })
+        .select()
+        .single();
+
+      if (surveyError) throw surveyError;
+
+      const optionsToInsert = suggestion.options.map(option => ({
+        survey_id: survey.id,
+        option_text: option
+      }));
+
+      const { error: optionsError } = await supabase
+        .from('survey_options')
+        .insert(optionsToInsert);
+
+      if (optionsError) throw optionsError;
+
+      toast.success('Survey published!');
+      setKeywordSuggestions(prev => prev.filter(s => s.title !== suggestion.title));
+    } catch (error) {
+      console.error('Error publishing survey:', error);
+      toast.error('Failed to publish survey.');
+    } finally {
+      setIsPublishing(null);
+    }
+  };
+
   const addOption = () => {
     if (manualSurvey.options.length < 6) {
       setManualSurvey(prev => ({
@@ -505,6 +587,100 @@ export default function AdminDashboard() {
                         <Button
                           className="w-full"
                           onClick={() => publishSuggestion(suggestion)}
+                          disabled={isPublishing === suggestion.title}
+                        >
+                          {isPublishing === suggestion.title ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4 mr-2" />
+                              Publish Survey
+                            </>
+                          )}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Keyword-Based Generation */}
+        <section>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-green-500/20 flex items-center justify-center">
+                  <Search className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <CardTitle>Generate from Keywords</CardTitle>
+                  <CardDescription>Enter keywords to generate targeted survey ideas</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <Label>Keywords</Label>
+                  <Input
+                    placeholder="e.g., coffee, morning routine, productivity..."
+                    value={keywords}
+                    onChange={e => setKeywords(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Separate keywords with commas for best results
+                  </p>
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    onClick={generateKeywordSuggestions}
+                    disabled={isGeneratingKeyword}
+                    variant="secondary"
+                    className="w-full sm:w-auto"
+                  >
+                    {isGeneratingKeyword ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4 mr-2" />
+                        Generate Ideas
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {keywordSuggestions.length > 0 && (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {keywordSuggestions.map((suggestion, index) => (
+                    <Card key={index} variant="elevated" className="overflow-hidden border-green-200">
+                      <CardContent className="p-4 space-y-3">
+                        <div>
+                          <span className="inline-block px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-700 mb-2">
+                            {categoryMap[suggestion.category.toLowerCase()] || suggestion.category}
+                          </span>
+                          <h3 className="font-semibold line-clamp-2">{suggestion.title}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                            {suggestion.description}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          {suggestion.options.map((option, i) => (
+                            <div key={i} className="text-sm px-2 py-1 bg-muted rounded">
+                              {option}
+                            </div>
+                          ))}
+                        </div>
+                        <Button
+                          className="w-full"
+                          variant="outline"
+                          onClick={() => publishKeywordSuggestion(suggestion)}
                           disabled={isPublishing === suggestion.title}
                         >
                           {isPublishing === suggestion.title ? (

@@ -11,14 +11,14 @@ serve(async (req) => {
   }
 
   try {
-    const { country, category } = await req.json();
+    const { country, category, keywords } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    console.log(`Generating survey suggestions for country: ${country}, category: ${category}`);
+    console.log(`Generating survey suggestions for country: ${country}, category: ${category}, keywords: ${keywords}`);
 
     const systemPrompt = `You are a creative survey suggestion generator for a community polling platform called VoiceHub. 
 Generate engaging, thought-provoking survey questions that will spark discussion and get people voting.
@@ -31,6 +31,7 @@ Rules:
 - Make questions relevant to the specified country/region when provided
 - Keep questions neutral and non-offensive
 - Include a brief image description for each survey (for AI image generation)
+${keywords ? `- Focus on these keywords/topics: ${keywords}` : ''}
 
 Return JSON in this exact format:
 {
@@ -45,9 +46,15 @@ Return JSON in this exact format:
   ]
 }`;
 
-    const userPrompt = country && country !== 'all'
-      ? `Generate 5 survey suggestions relevant to ${country}. ${category ? `Focus on ${category} topics.` : 'Mix different categories including news, everyday items, trends, and fun topics.'}`
-      : `Generate 5 global survey suggestions. ${category ? `Focus on ${category} topics.` : 'Mix different categories including international news, everyday items like household objects, trending topics, and fun entertainment scenarios.'}`;
+    let userPrompt = '';
+    
+    if (keywords) {
+      userPrompt = `Generate 5 survey suggestions based on these keywords: "${keywords}". Make the surveys engaging and relevant to these topics.`;
+    } else if (country && country !== 'all') {
+      userPrompt = `Generate 5 survey suggestions relevant to ${country}. ${category ? `Focus on ${category} topics.` : 'Mix different categories including news, everyday items, trends, and fun topics.'}`;
+    } else {
+      userPrompt = `Generate 5 global survey suggestions. ${category ? `Focus on ${category} topics.` : 'Mix different categories including international news, everyday items like household objects, trending topics, and fun entertainment scenarios.'}`;
+    }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

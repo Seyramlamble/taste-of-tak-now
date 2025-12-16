@@ -1,4 +1,7 @@
 export type ReactionType = 'like' | 'dislike' | 'laugh' | 'sad';
+export type GroupType = 'family' | 'company';
+export type GroupRole = 'owner' | 'admin' | 'member';
+export type InviteStatus = 'pending' | 'accepted' | 'declined' | 'expired';
 
 export interface Profile {
   id: string;
@@ -33,6 +36,8 @@ export interface Survey {
   target_country: string | null;
   allow_multiple_answers: boolean;
   is_published: boolean;
+  group_id: string | null;
+  is_public_link: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -70,6 +75,38 @@ export interface Comment {
   updated_at: string;
 }
 
+export interface Group {
+  id: string;
+  name: string;
+  description: string | null;
+  type: GroupType;
+  owner_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GroupMember {
+  id: string;
+  group_id: string;
+  user_id: string;
+  role: GroupRole;
+  joined_at: string;
+}
+
+export interface SurveyInvite {
+  id: string;
+  survey_id: string;
+  email: string | null;
+  invite_token: string;
+  status: InviteStatus;
+  created_at: string;
+  expires_at: string;
+}
+
+export interface GroupWithMembers extends Group {
+  members: (GroupMember & { profile?: Profile })[];
+}
+
 export interface SurveyWithDetails extends Survey {
   options: SurveyOption[];
   reactions: Reaction[];
@@ -78,4 +115,5 @@ export interface SurveyWithDetails extends Survey {
   author?: Profile;
   userVotes?: string[];
   userReaction?: ReactionType | null;
+  group?: Group;
 }

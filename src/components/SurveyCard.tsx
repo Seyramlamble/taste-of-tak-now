@@ -11,9 +11,9 @@ import { toast } from 'sonner';
 
 interface SurveyCardProps {
   survey: SurveyWithDetails;
-  onVote: (surveyId: string, optionId: string) => void;
-  onReact: (surveyId: string, reaction: ReactionType) => void;
-  onComment: (surveyId: string, content: string) => void;
+  onVote?: (surveyId: string, optionId: string) => void;
+  onReact?: (surveyId: string, reaction: ReactionType) => void;
+  onComment?: (surveyId: string, content: string) => void;
 }
 
 const reactionConfig: Record<ReactionType, { icon: typeof ThumbsUp; label: string; activeClass: string }> = {
@@ -45,7 +45,7 @@ export function SurveyCard({ survey, onVote, onReact, onComment }: SurveyCardPro
   };
 
   const handleSubmitComment = () => {
-    if (!commentText.trim()) return;
+    if (!commentText.trim() || !onComment) return;
     onComment(survey.id, commentText.trim());
     setCommentText('');
   };
