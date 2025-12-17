@@ -282,9 +282,9 @@ export default function AdminDashboard() {
 
       toast.success('Survey published successfully!');
       setSuggestions(prev => prev.filter(s => s.title !== suggestion.title));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error publishing survey:', error);
-      toast.error('Failed to publish survey.');
+      toast.error(error?.message || 'Failed to publish survey.');
     } finally {
       setIsPublishing(null);
     }
@@ -341,9 +341,9 @@ export default function AdminDashboard() {
         allowMultiple: false,
         imageUrl: ''
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating survey:', error);
-      toast.error('Failed to create survey.');
+      toast.error(error?.message || 'Failed to create survey.');
     }
   };
 
@@ -414,9 +414,9 @@ export default function AdminDashboard() {
 
       toast.success('Survey published!');
       setKeywordSuggestions(prev => prev.filter(s => s.title !== suggestion.title));
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error publishing survey:', error);
-      toast.error('Failed to publish survey.');
+      toast.error(error?.message || 'Failed to publish survey.');
     } finally {
       setIsPublishing(null);
     }
